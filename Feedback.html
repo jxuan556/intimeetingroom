@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,22 +8,24 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
     <nav class="navbar navbar-expand-lg navbar-light fixed-top">
         <a class="navbar-brand" href="#">
             <img src="img/INTI_Logo.png" alt="INTI University Logo" style="width: 300px; height: auto;">
         </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
         <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
             <ul class="navbar-nav mx-auto">
-                <li class="nav-item"><a href="Dashboard.html" class="nav-link">Home</a></li>
-                <li class="nav-item"><a href="Room_Details.html" class="nav-link">Room Details</a></li>
-                <li class="nav-item"><a href="Reservation_Schedule.html" class="nav-link">Reserve Table</a></li>
-                <li class="nav-item"><a href="Booking_History.html" class="nav-link">Booking History</a></li>
+                <li class="nav-item"><a href="student_dashboard.php" class="nav-link">Home</a></li>
+                <li class="nav-item"><a href="student_room_details.php" class="nav-link">Room Details</a></li>
+                <li class="nav-item"><a href="booking_history.php" class="nav-link">Booking History</a></li>
                 <li class="nav-item"><a href="Need_Help.html" class="nav-link">Need Help</a></li>
+                <li class="nav-item"><a href="view_feedback_reply.php" class="nav-link">Feedback Reply</a></li>
                 <li class="nav-item"><a href="Frequently_Asked_Questions.html" class="nav-link">FAQ</a></li>
                 <li class="nav-item"><a href="The_Librarians.html" class="nav-link">The Librarians</a></li>
-                <li class="nav-item"><a href="User.html" class="nav-link">User</a></li>
+                <li class="nav-item"><a href="user_profile.php" class="nav-link">User</a></li>
             </ul>
         </div>
     </nav>
@@ -34,17 +35,17 @@
         <h2 class="mb-3 highlight">We value your opinion!</h2>
         <p class="mb-4">If you have any feedback or inquiries for us, we'd love to hear it! Please share your thoughts below.</p>
 
-        <form>
+        <form action="submit_feedback.php" method="POST">
             <div class="form-group">
                 <label for="message">Message:</label>
                 <textarea id="message" name="message" class="form-control" rows="5" required></textarea>
             </div>
             <div class="text-center">
-                <button type="button" class="btn btn-primary" onclick="submitFeedback()">Submit</button>
+                <button type="submit" class="btn btn-primary">Submit</button>
             </div>
         </form>
 
-        <img src="img/feedback.jpg" alt="Feedback QR Code" class="qr-image"> <!-- Updated image here -->
+        <img src="img/feedback.jpg" alt="Feedback QR Code" class="qr-image">
 
         <div class="modal fade" id="feedbackModal" tabindex="-1" role="dialog" aria-labelledby="feedbackModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
@@ -66,7 +67,7 @@
 
     <footer>
         <p>Recommended Browser: Google Chrome</p>
-        <p>Copyright © 2024 INTI International College Penang Library</p>
+        <p>&copy; 2024 INTI International College Penang Library</p>
         <p>Tel: +604-6310138 | Fax: +604-6310193</p>
         <p>&copy; 2024 INTI University - All Rights Reserved</p>
     </footer>
@@ -75,8 +76,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="javascript/Feedback_script.js"></script>
-
-
 </body>
-
 </html>
+

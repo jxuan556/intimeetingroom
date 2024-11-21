@@ -1,64 +1,50 @@
-        // Function to open the booking modal with the selected room name
-        function openBookingModal(roomName) {
-            // Set the room name in the modal
-            document.getElementById('roomName').textContent = roomName;
-            
-            // Show the booking modal
-            $('#bookingModal').modal('show');
+function openBookingModal(roomName) {
+    document.getElementById("roomName").innerText = roomName;
+    $('#bookingModal').modal('show');
+}
+
+function reserveRoom(event) {
+    event.preventDefault();
+
+    const formData = {
+        room_name: document.getElementById("roomName").innerText,
+        booking_date: document.getElementById("date").value,
+        booking_time: document.getElementById("time").value,
+        duration: document.getElementById("duration").value,
+        notes: document.getElementById("notes").value
+    };
+
+    const bookingDateTime = new Date(`${formData.booking_date}T${formData.booking_time}`);
+    const currentDateTime = new Date();
+
+    const dayOfWeek = bookingDateTime.getUTCDay();  
+    if (dayOfWeek === 0 || dayOfWeek === 6) {
+        alert("Booking is not allowed on weekends (Saturday and Sunday). Please choose a weekday.");
+        return;
+    }
+
+    if (bookingDateTime <= currentDateTime) {
+        alert("You cannot book a room in the past.");
+        return;
+    }
+
+    fetch('store_booking.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+        if (data.status === "success") {
+            $('#bookingModal').modal('hide');
+            document.getElementById("bookingForm").reset();
+            window.location.href = "booking_history.php"; 
         }
+    });
+}
 
-        // Function to handle room reservation
-        function reserveRoom(event) {
-            event.preventDefault();
 
-            // Collect input values
-            const roomName = document.getElementById('roomName').textContent; // Get room name from text content
-            const date = document.getElementById('date').value;
-            const time = document.getElementById('time').value;
-            const duration = document.getElementById('duration').value;
-            const notes = document.getElementById('notes').value;
 
-            // Check if all fields are filled
-            if (!date || !time || !duration) {
-                alert('Please fill in all required fields.');
-                return;
-            }
 
-            // Create booking object
-            const booking = { room: roomName, date, time, duration, notes };
-            let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
 
-            // Check if the room is available before saving
-            if (checkRoomAvailability(bookings, booking)) {
-                bookings.push(booking);
-                localStorage.setItem("bookings", JSON.stringify(bookings));
-
-                // Show success notification
-                const notification = document.getElementById('notification');
-                notification.style.display = 'block';
-
-                // Hide notification and redirect after 2 seconds
-                setTimeout(() => {
-                    notification.style.display = 'none';
-                    window.location.href = 'Booking_History.html';
-                }, 2000);
-
-                // Clear the form fields
-                document.getElementById('bookingForm').reset();
-            } else {
-                alert('The selected room is already booked for this time slot. Please choose a different time.');
-            }
-        }
-
-        // Function to check room availability, including overlapping time slots
-        function checkRoomAvailability(bookings, newBooking) {
-            return !bookings.some(booking => 
-                booking.room === newBooking.room &&
-                booking.date === newBooking.date &&
-                booking.time === newBooking.time
-            );
-        }
-
-        // Set the minimum date to today's date for the booking date input
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('date').setAttribute('min', today);

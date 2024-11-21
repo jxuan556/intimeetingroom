@@ -1,3 +1,59 @@
+<?php
+session_start();
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+
+$conn = new mysqli("localhost", "root", "", "meetingroom");
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+$user_id = $_SESSION['user_id'];
+$stmt = $conn->prepare("SELECT email, profile_icon FROM users WHERE id = ?");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows === 1) {
+    $user = $result->fetch_assoc();
+    $email = $user['email'];
+    $profile_icon = $user['profile_icon'] ? $user['profile_icon'] : "default-profile-icon.png";
+} else {
+    echo "User not found";
+    exit();
+}
+
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_FILES['newIcon'])) {
+    $target_dir = "uploads/";
+    if (!is_dir($target_dir)) {
+        mkdir($target_dir, 0777, true);
+    }
+    $target_file = $target_dir . basename($_FILES["newIcon"]["name"]);
+
+    if ($_FILES["newIcon"]["error"] === UPLOAD_ERR_OK) {
+        if (move_uploaded_file($_FILES["newIcon"]["tmp_name"], $target_file)) {
+            $stmt = $conn->prepare("UPDATE users SET profile_icon = ? WHERE id = ?");
+            $stmt->bind_param("si", $target_file, $user_id);
+            $stmt->execute();
+            header("Location: user_profile2.php"); 
+            exit();
+        } else {
+            echo "<p style='color:red;'>Failed to upload image. Check directory permissions.</p>";
+        }
+    } else {
+        echo "<p style='color:red;'>File upload error code: " . $_FILES["newIcon"]["error"] . "</p>";
+    }
+}
+
+$conn->close();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -12,7 +68,6 @@
 </head>
 
 <body>
-
     <nav class="navbar navbar-expand-lg navbar-light fixed-top">
         <a class="navbar-brand" href="#">
             <img src="img/INTI_Logo.png" alt="INTI University Logo" style="width: 300px; height: auto;">
@@ -23,57 +78,49 @@
         </button>
         <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
             <ul class="navbar-nav">
-                <li class="nav-item"><a href="Dashboard.html" class="nav-link">Home</a></li>
-                <li class="nav-item"><a href="Room_Details.html" class="nav-link">Room Details</a></li>
-                <li class="nav-item"><a href="Reservation_Schedule.html" class="nav-link">Reserve Table</a></li>
-                <li class="nav-item"><a href="Booking_History.html" class="nav-link">Booking History</a></li>
-                <li class="nav-item"><a href="Need_Help.html" class="nav-link">Need Help</a></li>
-                <li class="nav-item"><a href="Feedback.html" class="nav-link">Feedback</a></li>
-                <li class="nav-item"><a href="Frequently_Asked_Questions.html" class="nav-link">FAQ</a></li>
-                <li class="nav-item"><a href="The_Librarians.html" class="nav-link">The Librarians</a></li>
+                <li class="nav-item"><a href="admin_dashboard.php" class="nav-link">Admin Dashboard</a></li>
+                <li class="nav-item"><a href="admin_manage_rooms.php" class="nav-link">Manage Rooms</a></li>
+                <li class="nav-item"><a href="admin_manage_bookings.php" class="nav-link">Manage Bookings</a></li>
+                <li class="nav-item"><a href="view_feedback.php" class="nav-link">View Feedback</a></li>
             </ul>
         </div>
     </nav>
 
-    <!-- User Profile Section -->
     <div class="container mt-5 pt-5">
         <div class="profile-info text-center mb-4">
-            <img id="profileIcon" src="default-profile-icon.png" alt="Profile Icon" class="img-fluid rounded-circle" width="150">
-            <h1 id="name">User</h1>
-            <p>Email: <span id="email">user@example.com</span></p>
+            <img id="profileIcon" src="<?php echo htmlspecialchars($profile_icon); ?>" alt="Profile Icon" class="img-fluid rounded-circle" width="150">
+            <p>Email: <span id="email"><?php echo htmlspecialchars($email); ?></span></p>
         </div>
 
-        <!-- Notification Area -->
         <div id="notification" class="alert alert-success" style="display: none;"></div>
 
-        <!-- Profile Update Section -->
         <div class="container mb-4 text-center">
             <h2 class="mb-4">Update Profile</h2>
             <div class="card mx-auto" style="max-width: 400px;">
                 <div class="card-body">
-                    <div class="form-group">
-                        <label for="newIcon" class="d-block">New Profile Icon:</label>
-                        <input type="file" id="newIcon" accept="image/*" class="form-control-file" onchange="previewProfileIcon(event)">
-                    </div>
-                    <button onclick="updateAccount()" class="btn btn-primary btn-block">Update</button>
+                    <form method="POST" action="user_profile.php" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label for="newIcon" class="d-block">New Profile Icon:</label>
+                            <input type="file" id="newIcon" name="newIcon" accept="image/*" class="form-control-file">
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Update</button>
+                    </form>
                 </div>
             </div>
         </div>
 
-        <!-- Action Buttons -->
         <div class="text-center">
-            <button onclick="logOut()" class="btn btn-secondary" data-toggle="modal" data-target="#logoutModal">Log Out</button>
+            <button class="btn btn-secondary" data-toggle="modal" data-target="#logoutModal">Log Out</button>
         </div>
     </div>
 
-    <footer>
+    <footer class="text-center mt-5">
         <p>Recommended Browser: Google Chrome</p>
         <p>Copyright © 2024 INTI International College Penang Library</p>
         <p>Tel: +604-6310138 | Fax: +604-6310193</p>
         <p>&copy; 2024 INTI University - All Rights Reserved</p>
     </footer>
 
-    <!-- Logout Modal -->
     <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -88,21 +135,14 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
-                    <button type="button" class="btn btn-danger" onclick="confirmLogOut()">Yes, Log Out</button>
+                    <button type="button" class="btn btn-danger" onclick="window.location.href='logout.php'">Yes, Log Out</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Bootstrap JS and Dependencies -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="javascript/User_script.js"></script>
-
 </body>
-
 </html>
-
-
-
