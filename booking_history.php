@@ -26,7 +26,8 @@ $canceledBookings = [];
 
 while ($row = $result->fetch_assoc()) {
     $bookingDateTime = new DateTime("{$row['booking_date']} {$row['booking_time']}");
-    if ($bookingDateTime <= $currentDateTime || !empty($row['cancellation_reason'])) {
+    
+    if ($bookingDateTime < $currentDateTime || !empty($row['cancellation_reason'])) {
         $pastBookings[] = $row;
         if (!empty($row['cancellation_reason'])) {
             $canceledBookings[] = $row;
@@ -50,32 +51,33 @@ if ($showNotification) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feedback</title>
+    <title>Booking History</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
-        <a class="navbar-brand" href="#">
-            <img src="img/INTI_Logo.png" alt="INTI University Logo" style="width: 300px; height: auto;">
-        </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
-            <ul class="navbar-nav mx-auto">
-                <li class="nav-item"><a href="student_dashboard.php" class="nav-link">Home</a></li>
-                <li class="nav-item"><a href="student_room_details.php" class="nav-link">Room Details</a></li>
-                <li class="nav-item"><a href="Need_Help.html" class="nav-link">Need Help</a></li>
-                <li class="nav-item"><a href="Feedback.html" class="nav-link">Feedback</a></li>
-                <li class="nav-item"><a href="view_feedback_reply.php" class="nav-link">Feedback Reply</a></li>
-                <li class="nav-item"><a href="Frequently_Asked_Questions.html" class="nav-link">FAQ</a></li>
-                <li class="nav-item"><a href="The_Librarians.html" class="nav-link">The Librarians</a></li>
-                <li class="nav-item"><a href="user_profile.php" class="nav-link">User</a></li>
-            </ul>
-        </div>
-    </nav>
+<nav class="navbar navbar-expand-lg navbar-light fixed-top">
+    <a class="navbar-brand" href="#">
+        <img src="img/INTI_Logo.png" alt="INTI University Logo" style="width: 300px; height: auto;">
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+        <ul class="navbar-nav mx-auto">
+            <li class="nav-item"><a href="student_dashboard.php" class="nav-link">Home</a></li>
+            <li class="nav-item"><a href="student_room_details.php" class="nav-link">Room Details</a></li>
+            <li class="nav-item"><a href="Need_Help.html" class="nav-link">Need Help</a></li>
+            <li class="nav-item"><a href="Feedback.html" class="nav-link">Feedback</a></li>
+            <li class="nav-item"><a href="view_feedback_reply.php" class="nav-link">Feedback Reply</a></li>
+            <li class="nav-item"><a href="Frequently_Asked_Questions.html" class="nav-link">FAQ</a></li>
+            <li class="nav-item"><a href="The_Librarians.html" class="nav-link">The Librarians</a></li>
+            <li class="nav-item"><a href="user_profile.php" class="nav-link">User</a></li>
+        </ul>
+    </div>
+</nav>
+
 <div class="container mt-5 pt-5">
     <h3 class="text-center mb-4">Booking History</h3>
 
@@ -147,15 +149,15 @@ if ($showNotification) {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 <script type="text/javascript" src="javascript/Booking_History_script.js"></script>
 
-
-    <footer>
-        <p>Recommended Browser: Google Chrome</p>
-        <p>&copy; 2024 INTI International College Penang Library</p>
-        <p>Tel: +604-6310138 | Fax: +604-6310193</p>
-        <p>&copy; 2024 INTI University - All Rights Reserved</p>
-    </footer>
+<footer>
+    <p>Recommended Browser: Google Chrome</p>
+    <p>&copy; 2024 INTI International College Penang Library</p>
+    <p>Tel: +604-6310138 | Fax: +604-6310193</p>
+    <p>&copy; 2024 INTI University - All Rights Reserved</p>
+</footer>
 </body>
 </html>
+
 
 
 

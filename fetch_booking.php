@@ -19,6 +19,9 @@ if ($conn->connect_error) {
 
 $userId = $_SESSION['user_id'];
 $currentDateTime = new DateTime();
+$currentDate = $currentDateTime->format('Y-m-d'); 
+$currentTime = $currentDateTime->format('H:i:s'); 
+
 $upcomingBookings = [];
 $pastBookings = [];
 
@@ -29,13 +32,22 @@ $stmt->bind_param("i", $userId);
 if ($stmt->execute()) {
     $result = $stmt->get_result();
     while ($row = $result->fetch_assoc()) {
-        $bookingDateTime = new DateTime("{$row['booking_date']} {$row['booking_time']}");
-        if ($bookingDateTime < $currentDateTime) {
+        $bookingDate = $row['booking_date'];
+        $bookingTime = $row['booking_time'];
+
+        if ($bookingDate < $currentDate) {
             $pastBookings[] = $row;
+        } elseif ($bookingDate == $currentDate) {
+            if ($bookingTime < $currentTime) {
+                $pastBookings[] = $row; 
+            } else {
+                $upcomingBookings[] = $row; 
+            }
         } else {
             $upcomingBookings[] = $row;
         }
     }
+
     $response = [
         "status" => "success",
         "upcomingBookings" => $upcomingBookings,
@@ -46,9 +58,11 @@ if ($stmt->execute()) {
 }
 
 echo json_encode($response);
+
 $stmt->close();
 $conn->close();
 ?>
+
 
 
 
